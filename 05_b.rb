@@ -1,6 +1,4 @@
 description = <<-desc
-WIP
-
 --- Part Two ---
 
 Realizing the error of his ways, Santa has switched to a better model of determining whether a string
@@ -46,11 +44,13 @@ def check_pairs(str)
 end
 
 def check_repeating_letter(str)
-  str.each_char do |i|
-    search = "#{i}(.*)#{i}"
-    r = Regexp.new(search)
-    result = str.scan(r)
-    if result.length == 1 && result[0][0].size == 1 then puts puts str; puts search; puts result; return true; end
+  targets = Array.new
+  (0 .. (str.size - 3)).step(1) do |i|
+    targets << str[i .. i + 2]
+  end
+
+  targets.each do |i|
+    if i[0] == i[2] then return true; end
   end
 
   false
