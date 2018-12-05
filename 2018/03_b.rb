@@ -2,7 +2,6 @@
 require "set"
 
 count = 0
-no_overlap = nil
 rows, cols = 1000, 1000
 grid = Array.new(rows) { Array.new(cols) }
 
@@ -28,23 +27,36 @@ def parse_lines(line)
   return num, x, y, size_x, size_y
 end
 
-lines.each do |l|
-  puts l
-  n, x, y, size_x, size_y = parse_lines(l)
-  overlap = false
+no_overlap_number = nil
 
+lines.each do |l|
+  #puts l
+  n, x, y, size_x, size_y = parse_lines(l)
   x.upto(x + size_x - 1) do |i|
     y.upto(y + size_y - 1) do |j|
       if grid[i][j] == nil
-        grid[i][j] = n.to_s
+	grid[i][j] = n.to_s
       else
-	overlap = true
-        grid[i][j] = "X"
+	grid[i][j] = "X"
+      end
+    end
+  end
+end
+
+lines.each do |l|
+  #puts l
+  no_overlap = true
+  n, x, y, size_x, size_y = parse_lines(l)
+  
+  x.upto(x + size_x - 1) do |i|
+    y.upto(y + size_y - 1) do |j|
+      if grid[i][j] == "X"
+	no_overlap = false
       end
     end
   end
 
-  no_overlap = n unless overlap
+  puts n if no_overlap
 end
 
 
@@ -56,4 +68,4 @@ end
   end
 end
 
-puts "Answer is #{no_overlap}"
+puts "Answer is #{no_overlap_number}"
