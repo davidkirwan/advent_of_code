@@ -1084,4 +1084,3 @@
 [1518-05-24 23:51] Guard #349 begins shift
 [1518-03-01 00:57] falls asleep
 [1518-07-05 23:51] Guard #877 begins shift
-
