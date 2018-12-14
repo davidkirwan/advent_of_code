@@ -60,11 +60,14 @@ def process_events(id, event, guard_list)
 end
 
 
-def process_events(k, v)
+def process_s(k, v)
   puts "Key: #{k}, #{v[:events].size}"
 
-  v[]
+  v[:events].each do |i|
+    puts i.inspect
+  end
 end
+
 
 File.foreach("04_input_sorted.txt").with_index do |line, line_num|
   parsed = parse_lines(line)
@@ -77,11 +80,8 @@ File.foreach("04_input_sorted.txt").with_index do |line, line_num|
 end
 
 guard_list.each do |k,v|
-  process_events(k, v)
+  process_s(k, v)
 end
-
-
-
 
 
 #puts "Answer is xxxxxx"
