@@ -106,20 +106,21 @@ guard_list.each do |k,v|
 end
 
 guard_with_most_sleep_id = 0
-guard_with_most_sleep = 0
+guard_with_most_sleep_on_target_minute = 0
+target_minute = 49
 
 
 guard_list.each do |k,v|
-  if guard_with_most_sleep < v[:total_minutes]
+  if guard_with_most_sleep_on_target_minute < v[:calendar][target_minute]
     guard_with_most_sleep_id = k
-    guard_with_most_sleep = v[:total_minutes]
+    guard_with_most_sleep_on_target_minute = v[:calendar][target_minute]
   end
-  puts "Guard #{k}, slept for: #{v[:total_minutes]}"
+  puts "Guard #{k}, was asleep: #{v[:calendar][49]} times on target minute"
 end
 
 
-puts "Guard with most sleep is #{guard_with_most_sleep_id} with total of: #{guard_with_most_sleep}"
-puts "Answer should be: #{guard_list[guard_with_most_sleep_id][:calendar].each_with_index.max[1] * guard_with_most_sleep_id}"
+puts "Guard asleep on target minute most is #{guard_with_most_sleep_id} with total of: #{guard_with_most_sleep_on_target_minute}"
+puts "Answer should be: #{target_minute * guard_with_most_sleep_id}"
 
 
 
