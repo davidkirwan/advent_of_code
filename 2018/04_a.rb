@@ -62,9 +62,31 @@ end
 
 def process_s(k, v)
   puts "Key: #{k}, #{v[:events].size}"
+  
+  calendar = v[:calendar]
+  last_event = nil
+  total_minutes = 0
 
   v[:events].each do |i|
-    puts i.inspect
+    #puts i.inspect
+    if i[:data][:action] == 1
+      if last_event[:data][:action] == 0
+	puts i[:time]
+	puts last_event[:time]
+	puts i[:time].min - last_event[:time].min
+	puts
+	start = last_event[:time].min
+	finish = i[:time].min
+
+	total_minutes += (finish-start)
+        start.upto(finish) do |x|
+	  calendar[x] += 1
+	end
+      end
+    end
+    v[:total_minutes] = total_minutes
+    puts calendar.inspect
+    last_event = i
   end
 end
 
@@ -83,5 +105,21 @@ guard_list.each do |k,v|
   process_s(k, v)
 end
 
+guard_with_most_sleep_id = 0
+guard_with_most_sleep = 0
 
-#puts "Answer is xxxxxx"
+
+guard_list.each do |k,v|
+  if guard_with_most_sleep < v[:total_minutes]
+    guard_with_most_sleep_id = k
+    guard_with_most_sleep = v[:total_minutes]
+  end
+  puts "Guard #{k}, slept for: #{v[:total_minutes]}"
+end
+
+
+puts "Guard with most sleep is #{guard_with_most_sleep_id} with total of: #{guard_with_most_sleep}"
+puts guard_list[guard_with_most_sleep_id][:calendar].inspect
+
+
+
