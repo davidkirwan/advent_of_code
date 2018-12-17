@@ -40,4 +40,4 @@ File.foreach("05_input.txt").with_index do |line, line_num|
   end
 end
 
-puts "The answer should be #{input.length}"
+puts "The answer should be #{output.length}"
