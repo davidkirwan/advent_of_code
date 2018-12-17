@@ -5,11 +5,21 @@ output = nil
 counter = 0
 
 def process_input(input)
-  input_array = input.chars.each_slice(2).map(&:join)
-  output = input_array.reject do |i|
-    i[0] != i[1] && i[0].upcase == i[1] || i[0].downcase == i[1]
+  input_array = input.chars
+  i = 0
+  loop do
+    unless i == input_array.size - 1
+      if input_array[i].swapcase == input_array[i + 1]
+        #puts "Deleting #{input_array[i] + input_array[i+1]}"
+        2.times {input_array.delete_at(i)}
+      end
+    else
+      break
+    end
+    i += 1
   end
-  output = output.join
+
+  output = input_array.join
   if input == output
     complete_check = true
   else
@@ -30,5 +40,4 @@ File.foreach("05_input.txt").with_index do |line, line_num|
   end
 end
 
-puts counter
-
+puts "The answer should be #{input.length}"
