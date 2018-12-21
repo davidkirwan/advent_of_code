@@ -36,11 +36,12 @@ def process_input(input)
   input_array = input.chars
   i = 0
   loop do
-    unless i == input_array.size - 1
+    unless i >= input_array.size - 1
       if input_array[i] == nil
-	puts input
-	puts input_array.inspect
-	puts "#{i}, #{input_array.size -1}"
+	#puts input
+	#puts input_array.inspect
+	#puts "#{i}, #{input_array.size - 1}"
+	nil
       else
         if input_array[i].swapcase == input_array[i + 1]
           #puts "Deleting #{input_array[i] + input_array[i+1]}"
@@ -80,8 +81,9 @@ results.each do |k, v|
       output = input
     end
   end
-  v = output.length
-  puts "#{k}: #{v}"
+  results[k] = output.length
+  puts "#{k}: #{output.length}"
 end
 
 puts results.min_by {|k, v| v}.inspect
+puts results.inspect
