@@ -5,7 +5,8 @@ def process_input(input)
   return {}
 end
 
+output = 0 
 File.foreach("06_input.txt").with_index do |line, line_num|
 end
 
-puts "The answer should be #{output.length}"
+puts "The answer should be #{output}"
