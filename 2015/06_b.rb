@@ -5,19 +5,15 @@ row, col, default_value = 1000, 1000, 0
 commands = []
 
 def light_on(x, y)
-    @lights[x][y] = 1
+    @lights[x][y] += 1
 end
 
 def light_off(x, y)
-    @lights[x][y] = 0
+    @lights[x][y] -= 1 unless @lights[x][y] == 0
 end
 
 def light_toggle(x, y)
-    if @lights[x][y] == 1
-        light_off(x, y)
-    else
-        light_on(x, y)
-    end
+    @lights[x][y] += 2
 end
 
 def on(x1, y1, x2, y2)
@@ -49,8 +45,8 @@ def count()
 
     0.upto(999) do |i|
         0.upto(999) do |j|
-            if @lights[i][j] == 1
-                x += 1
+            if @lights[i][j] > 0
+                x += @lights[i][j]
             end
         end
     end
