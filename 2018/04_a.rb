@@ -1,8 +1,18 @@
-# Sorted the input using VIM: shift+v, G, :'<,'>sort
+=begin 
+2018 04 b
+
+Sorted the input using vim commands:
+
+shift+v, G, :'<,'>sort
+%s/\[//g
+%s/\]//g
+%s/\(.\{-}\zs\s\)\{2}/,/g
+=end
+
 require "time"
 
-id = 0
-guard_list = {}
+@id = 0
+@guard_list = {}
 
 ACTION = {
   :guard => 2,
@@ -18,18 +28,13 @@ ACTION_DESCRIPTION = {
   -1 => "Unknown"
 }
 
-def parse_lines(line)
-  l = line.split("]")
-  l[0].gsub!("[", "")
-  l[1].strip!
-
+def parse_line(line)
+  l = line.split(",")
   t = Time.strptime(l[0], '%Y-%m-%d %H:%M')
   
   if l[1].include?("Guard")
     action = ACTION[:guard]
-    guard = l[1].split(" ")
-    guard_id = guard[1].gsub!("#", "")
-    gid = guard_id.to_i
+    gid = (l[1].split(" ")[1].gsub!("#", "")).to_i
   elsif l[1].include?("wakes")
     action = ACTION[:wake]
   elsif l[1].include?("falls")
@@ -46,80 +51,65 @@ def parse_lines(line)
   return {:time=>t, :data=>d}
 end
 
+def process_line(parsed)
+  if parsed[:data][:action] == ACTION[:guard]
+    @id = parsed[:data][:id]
+  else
+    parsed[:data][:id] = @id
+  end
 
-def process_events(id, event, guard_list)
-  unless guard_list.has_key?(id)
-    guard_list[id] = {
-      :events=>[],
-      :calendar=>Array.new(60,0)
+  if @guard_list.has_key?(@id)
+    @guard_list[@id][:events].append(parsed) unless parsed[:data][:action] == ACTION[:guard]
+  else
+    @guard_list[@id] = {
+      :events => [],
+      :minutes => Array.new(60,0),
+      :total_sleep => 0
     }
+    @guard_list[@id][:events].append(parsed) unless parsed[:data][:action] == ACTION[:guard]
   end
-  guard_list[id][:events] << event
-
-  return true
+  puts "At #{parsed[:time]} guard: ##{parsed[:data][:id]} #{ACTION_DESCRIPTION[parsed[:data][:action]]}"
 end
-
-
-def process_s(k, v)
-  puts "Key: #{k}, #{v[:events].size}"
-  
-  calendar = v[:calendar]
-  last_event = nil
-  total_minutes = 0
-
-  v[:events].each do |i|
-    #puts i.inspect
-    if i[:data][:action] == 1
-      if last_event[:data][:action] == 0
-	puts i[:time]
-	puts last_event[:time]
-	puts i[:time].min - last_event[:time].min
-	puts
-	start = last_event[:time].min
-	finish = i[:time].min
-
-	total_minutes += (finish-start)
-        start.upto(finish) do |x|
-	  calendar[x] += 1
-	end
-      end
-    end
-    v[:total_minutes] = total_minutes
-    puts calendar.inspect
-    last_event = i
-  end
-end
-
 
 File.foreach("04_input_sorted.txt").with_index do |line, line_num|
-  parsed = parse_lines(line)
-  if parsed[:data][:action] == ACTION[:guard]
-    id = parsed[:data][:id]
+  parsed = parse_line(line)
+  process_line(parsed)
+end
+
+@guard_list.each do |k,v|
+  puts "guard: #{k} events: #{v[:events].size}"
+  v[:events].each_with_index do |i, index|
+    #puts i.inspect
+    if i[:data][:action] == ACTION[:wake]
+      previous = v[:events][index - 1]
+      if previous[:data][:action] == ACTION[:sleep]
+        e = i[:time].min
+        s = previous[:time].min
+        s.upto(e) do |m|
+          # increment the number of minutes sleep for guard k at minute m
+          v[:minutes][m] += 1
+        end
+      end
+    end
   end
-  puts "At #{parsed[:time]} #{id} #{ACTION_DESCRIPTION[parsed[:data][:action]]}"
-
-  process_events(id, parsed, guard_list)
+  v[:total_sleep] = v[:minutes].sum
 end
 
-guard_list.each do |k,v|
-  process_s(k, v)
-end
 
-guard_with_most_sleep_id = 0
-guard_with_most_sleep = 0
+most_asleep = nil
+most_asleep_minutes = 0
+most_asleep_minute = 0
 
-
-guard_list.each do |k,v|
-  if guard_with_most_sleep < v[:total_minutes]
-    guard_with_most_sleep_id = k
-    guard_with_most_sleep = v[:total_minutes]
+@guard_list.each do |k,v|
+  count = v[:total_sleep]
+  if count > most_asleep_minutes
+    most_asleep = k
+    most_asleep_minutes = count
   end
-  puts "Guard #{k}, slept for: #{v[:total_minutes]}"
 end
 
+most_asleep_minute = @guard_list[most_asleep][:minutes].index(g[:minutes].compact.max)
 
-puts "Guard with most sleep is #{guard_with_most_sleep_id} with total of: #{guard_with_most_sleep}"
-puts "Answer should be: #{guard_list[guard_with_most_sleep_id][:calendar].each_with_index.max[1] * guard_with_most_sleep_id}"
-
-
-
+@result = {:id => most_asleep, :count=> most_asleep_minutes, :minute=> most_asleep_minute}
+puts @result.inspect
+puts "Result: #{@result[:id] * @result[:minute]}"
