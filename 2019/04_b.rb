@@ -22,7 +22,11 @@ How many different passwords within the range given in your puzzle input meet th
 
 Input:
 172851-675869
+
+Ans:
+1135
 =end
+
 @data = nil
 @numbers = Array.new
 
@@ -70,30 +74,39 @@ def number_no_large_matching_group(number)
   return result || number_has_other_adjacent(number)
 end
 
+# 669999
+
 def number_has_other_adjacent(number)
   digits = number.digits.reverse
-  possibilities = [{
-    [0,1] => [[2], [[2, 3],[3, 4], [4, 5]]],
-    [1,2] => [[0, 3], [[2, 3],[3, 4], [4, 5]]],
-    [2,3] => [[1, 4], [[2, 3],[3, 4], [4, 5]]],
-    [3,4] => [[2, 5], [[2, 3],[3, 4], [4, 5]]],
-    [4,5] => [[3], [[0, 1],[1, 2], [2, 3]]]
-  }]
-  result = true
-
+  possibilities = {
+    [0,1] => [2],
+    [1,2] => [0, 3],
+    [2,3] => [1, 4],
+    [3,4] => [2, 5],
+    [4,5] => [3]
+  }
+  result = false
   possibilities.each do |k,v|
+    result = false
     d0 = digits[k[0]]
     d1 = digits[k[1]]
     if d0 == d1
       v.each do |i|
-        if d0 == digits[i]
+        if d0 != digits[i]
+          result = true
+          #puts "\n", number, d0, d1, digits[i], result
+        else
+          #puts "\n", number, d0, d1, digits[i], result
           result = false
           break
         end
       end
     end
+    if result
+      return result
+    end
   end
-  return result
+  return result 
 end
 
 def rule_check(number)
@@ -103,25 +116,18 @@ def rule_check(number)
   rule4 = number_digits_never_decrease(number)
   rule5 = number_no_large_matching_group(number)
   
-
-  puts rule1, rule2, rule3, rule4, rule5
+  #puts "Number: #{number} R1:#{rule1}, R2:#{rule2}, R3:#{rule3}, R4:#{rule4}, R5:#{rule5}"
   return rule1 && rule2 && rule3 && rule4 && rule5
 end
 
 File.foreach("04_input.txt").with_index do |line, line_num|
-  puts line
   @data = line.strip.split("-").map(&:to_i)
-  puts "Line#{line_num} Size: #{@data.size}"
 end
 
-#puts @data.inspect
-#@data[0].upto(@data[1]) do |i|
-#  if rule_check(i) then @numbers.append(i); end
-#end
+puts @data.inspect
+@data[0].upto(@data[1]) do |i|
+  if rule_check(i) then @numbers.append(i); end
+end
 
 puts @numbers.inspect
 puts "Number of suitable codes: #{@numbers.size}"
-
-rule_check(669999)
-
-# 755 too low
