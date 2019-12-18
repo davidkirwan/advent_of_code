@@ -1,9 +1,11 @@
-# 2019 02 b
+# 2019 05 a WIP
 
 @data = nil
 OPCODES = {
     1 => "add",
     2 => "multiply",
+    3 => "input",
+    4 => "output",
     99 => "exit"
 }
 
@@ -33,6 +35,26 @@ def opcode_multiply(o)
   return o[1], o[2], @data[o[3]]
 end
 
+def opcode_input(o)
+  #puts "multiply #{o}"
+  #puts "address: #{o[3]} (#{@data[o[3]]})"
+  #puts "address: #{o[1]} (#{@data[o[1]]})"
+  #puts "address: #{o[2]} (#{@data[o[2]]})"
+  @data[o[3]] = @data[o[1]] * @data[o[2]]
+  #puts "address: #{o[3]} data: #{@data[o[3]]}\n"
+  return o[1], o[2], @data[o[3]]
+end
+
+def opcode_output(o)
+  #puts "multiply #{o}"
+  #puts "address: #{o[3]} (#{@data[o[3]]})"
+  #puts "address: #{o[1]} (#{@data[o[1]]})"
+  #puts "address: #{o[2]} (#{@data[o[2]]})"
+  @data[o[3]] = @data[o[1]] * @data[o[2]]
+  #puts "address: #{o[3]} data: #{@data[o[3]]}\n"
+  return o[1], o[2], @data[o[3]]
+end
+
 def opcode_exit(opcode)
   puts "exit #{opcode}"
   return -1
@@ -41,7 +63,7 @@ end
 # Instructions to change data[1] to 12
 # Instructions to change data[2] to 2
 
-File.foreach("02_input.txt").with_index do |line, line_num|
+File.foreach("05_input.txt").with_index do |line, line_num|
   @original_data = line.strip!.split(",").map(&:to_i)
 end
 
